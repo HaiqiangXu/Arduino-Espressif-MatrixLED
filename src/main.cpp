@@ -11,15 +11,19 @@ IPAddress subnet(255, 255, 255, 0);
 
 #elif MARQUEE
 #include <CLedMarquee.h>
-#elif TEST_HW
-#include <main.h>
 #endif
 
 // Type uint8_t is equivalent to unsigned byte/char and it's native/fastest data type for Atmel 8-bit controllers (ATMega 328P). int is signed 16-bit and long signed 32-bit for these MCUs
-// const uint8_t CLK_PIN = D13;    //SCK  [Master Clock]:        13
-// const uint8_t DATA_PIN = D11;   //MOSI [Master Out Slave In]: 11
+// D1 R1/Uno:        D1 Mini:
+// CLK_PIN = D13;    //D5       //SCK  [Master Clock]
+// DATA_PIN = D11;   //D7       //MOSI [Master Out Slave In]   
+// CS_PIN = D10;     //D8       //SS   [Slave Select]
 #if IS_ESP32
 const uint8_t CS_PIN = SS;
+#elif IS_D1MINI
+const uint8_t CLK_PIN = D5;
+const uint8_t DATA_PIN = D7;
+const uint8_t CS_PIN = D8;
 #else
 const uint8_t CS_PIN = D10;
 #endif
@@ -43,30 +47,40 @@ void setup()
         Serial.println("Debugging Led Matrix game");
     #endif
 
-    #ifdef GAME_TETRIS    
-        m_ledsController = new CLedGameController(CS_PIN, NUM_DEVICES, IN_AXIS_X, IN_AXIS_Y, IN_BUTTON, EGame::Tetris);
-    #elif GAME_SNAKE
-        m_ledsController = new CLedGameController(CS_PIN, NUM_DEVICES, IN_AXIS_X, IN_AXIS_Y, IN_BUTTON, EGame::Snake);
-        if (WiFi.config(local_IP, gateway, subnet)) // Configures static IP address
+    // Configure and init WiFi connection to router with static IP address
+    bool isTimeout = false;
+    if (WiFi.config(local_IP, gateway, subnet))
+    {
+        unsigned long lLastTime = millis();
+
+#ifdef DEBUG
+        Serial.println("Connecting to router...");
+#endif
+        WiFi.mode(WIFI_STA);            //WIFI_STA = station ('client') mode , WIFI_AP = access point ('hotspot/server') mode
+        WiFi.begin(ssid, password);     //connect to remote router
+        while (WiFi.status() != WL_CONNECTED && !isTimeout)
         {
-            bool isTimeout = false;
-            unsigned long lLastTime = millis();
-
-            WiFi.begin(ssid, password);             //connect to remote router
-            while (WiFi.status() != WL_CONNECTED && !isTimeout)
-            {
-                delay(500);
-                isTimeout = millis() - lLastTime >= Connect_Timeout;
-                lLastTime = millis();
-            }
-
-            if (!isTimeout)
-            {
-                CWebserver* webServer = new CWebserver();
-                m_ledsController->SetWebServer(webServer);
-            }
+            delay(300);
+            isTimeout = millis() - lLastTime >= Connect_Timeout;
+            lLastTime = millis();
         }
+#ifdef DEBUG
+        Serial.println("Connection OK.");
+        Serial.print("Board IP address: ");
+        Serial.println(WiFi.localIP());
+#endif
+    }
+
+    m_ledsController = new CLedGameController(CS_PIN, NUM_DEVICES, IN_AXIS_X, IN_AXIS_Y, IN_BUTTON,
+    #ifdef GAME_TETRIS    
+        EGame::Tetris);
+    #elif GAME_SNAKE
+        EGame::Snake);
     #endif
+
+    if (!isTimeout)
+        m_ledsController->CreateWebServer();
+
 #elif MARQUEE
     #ifdef DEBUG
         Serial.begin(9600);

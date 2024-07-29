@@ -14,7 +14,7 @@ void CLedGameSnake::RefreshAnimation()
         currItem = m_Snake->get(i);
         m_leds->setPoint(currItem->x, currItem->y, true);
 #ifdef DEBUG
-Serial.println("x " + String(i) + ": " + String(currItem->x) + " | y" + String(i) + ": " + String(currItem->y));
+    Serial.println("x " + String(i) + ": " + String(currItem->x) + " | y" + String(i) + ": " + String(currItem->y));
 #endif
     }
     m_leds->setPoint(m_Egg.x, m_Egg.y, true);
@@ -26,7 +26,7 @@ Serial.println("x " + String(i) + ": " + String(currItem->x) + " | y" + String(i
 void CLedGameSnake::GameCalculate()
 {
 #ifdef DEBUG
-Serial.print("Previous direction: " + String((int)m_lastDirection));
+    Serial.print("Previous direction: " + String((int)m_lastDirection));
 #endif
 
     SetNextSnakePos(m_lastDirection);               //set last direction by default
@@ -52,7 +52,7 @@ Serial.print("Previous direction: " + String((int)m_lastDirection));
     }
 
 #ifdef DEBUG
-Serial.println(". Set direction: " + String((int)m_lastDirection));
+    Serial.println(". Set direction: " + String((int)m_lastDirection));
 #endif
 }
 

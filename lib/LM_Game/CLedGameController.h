@@ -1,7 +1,6 @@
 #ifdef GAME
 
 #include "CLedGame.h"
-#include "CWebServer.h"
 
 enum class EGame { Tetris, Snake };
 
@@ -11,14 +10,15 @@ public:
     // Constructors
     CLedGameController(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, EGame newGame)
     {
+        m_webServer = NULL;
         m_currentGame = newGame;
         if (newGame == EGame::Tetris)
         {
-            m_ledGame = new CLedGameTetris(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton);
+            m_ledGame = new CLedGameTetris(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, m_webServer);
         }
         else if (newGame == EGame::Snake)
         {
-            m_ledGame = new CLedGameSnake(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton);
+            m_ledGame = new CLedGameSnake(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, m_webServer);
         }
     };
 
@@ -39,9 +39,9 @@ public:
         m_currentGame = newGame;
     };
 
-    void SetWebServer(CWebserver* webServer)
+    void CreateWebServer()
     {
-        m_webServer = webServer;
+        m_webServer = new CWebserver();
     };
 private:
     CLedGame* m_ledGame;

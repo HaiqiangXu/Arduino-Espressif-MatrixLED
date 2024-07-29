@@ -47,6 +47,44 @@ void CLedGame::ReadUserControls()
     //set changes to corresponding led
     m_lastDirectionX = m_joystick->GetDirectionX();
     m_lastDirectionY = m_joystick->GetDirectionY();
+#ifdef DEBUG
+    Serial.print("Reading Direction from Joystick X: " + String((int)m_lastDirectionX));
+    Serial.println(". Y: " + String((int)m_lastDirectionY));
+#endif
+
+    /*if (m_webServer != NULL)
+    {*/
+        m_webServer->HandleClient();
+
+#ifdef DEBUG
+        Serial.println("Reading Direction from webServer: " + String(m_webServer->ReadDirection()));
+#endif
+        if (m_webServer->ReadDirection() == 0)
+        {
+            m_lastDirectionX = EDirection::None;
+            m_lastDirectionY = EDirection::None;
+        }
+        else if (m_webServer->ReadDirection() == 1)
+        {
+            m_lastDirectionX = EDirection::Left;
+            m_lastDirectionY = EDirection::None;
+        }
+        else if (m_webServer->ReadDirection() == 2)
+        {
+            m_lastDirectionX = EDirection::Right;
+            m_lastDirectionY = EDirection::None;
+        }
+        else if (m_webServer->ReadDirection() == 3)
+        {
+            m_lastDirectionX = EDirection::None;
+            m_lastDirectionY = EDirection::Up;
+        }
+        else if (m_webServer->ReadDirection() == 4)
+        {
+            m_lastDirectionX = EDirection::None;
+            m_lastDirectionY = EDirection::Down;
+        }
+    //}
 }
 
 #endif

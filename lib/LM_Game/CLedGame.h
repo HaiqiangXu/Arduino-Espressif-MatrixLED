@@ -2,9 +2,9 @@
 
 #include <LinkedList.h>
 #include <MD_MAX72xx.h>
-//#include <TrueRandom.h>
 #include <CCommon.h>
 #include <CJoystick.h>
+#include <CWebserver.h>
 
 const unsigned long TIME_TO_POWER_DOWN = 60000;     //1 minute
 const uint8_t MAX_SNAKE_LENGTH = 16;
@@ -14,13 +14,18 @@ enum class EState { S_LOAD, S_SHOW, S_CALCULATE };
 class CLedGame
 {
 public:
-    CLedGame(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton)
+    CLedGame(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, CWebserver* webServer)
     {
         // initialize variables
+#if IS_D1MINI
+        m_leds = new MD_MAX72XX(MD_MAX72XX::FC16_HW, D7, D5, csPin, iNumDevices);
+#else
         m_leds = new MD_MAX72XX(MD_MAX72XX::FC16_HW, csPin, iNumDevices);
+#endif
         m_leds->begin();
         m_leds->control(MD_MAX72XX::INTENSITY, MAX_INTENSITY >> 4);
         m_iNumDevices = iNumDevices;
+        m_webServer = webServer;
 
         m_joystick = new CJoystick(iPinAxisX, iPinAxisY, iPinButton);
         m_lastDirectionX = EDirection::None;
@@ -31,14 +36,15 @@ public:
     void StartGame();
 
     // Data accessors
-	uint8_t GetNumDevices()
-	{
-		return m_iNumDevices;
-	};
+    uint8_t GetNumDevices()
+    {
+        return m_iNumDevices;
+    };
 protected:
     // Fields
     MD_MAX72XX* m_leds;
     CJoystick* m_joystick;
+    CWebserver* m_webServer;
     uint8_t m_iNumDevices;
     EDirection m_lastDirectionX, m_lastDirectionY, m_lastDirection;
     int m_iButtonZ;
@@ -56,7 +62,7 @@ protected:
 class CLedGameTetris : public CLedGame
 {
 public:
-    CLedGameTetris(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton)
+    CLedGameTetris(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, CWebserver* webServer) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, webServer)
     {
         // m_leds->setBuffer(1, sizeof(Pieces[0]), Pieces[0]);
         // m_leds->setBuffer(4, sizeof(Pieces[0]), Pieces[1]);
@@ -95,7 +101,7 @@ private:
 class CLedGameSnake : public CLedGame
 {
 public:
-    CLedGameSnake(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton)
+    CLedGameSnake(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, CWebserver* webServer) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, webServer)
     {
         m_Snake = new LinkedList<LongCoordinateXY*>();
         ResetGame();                            //implicitly starts with level 3 with 3 dots for the snake
