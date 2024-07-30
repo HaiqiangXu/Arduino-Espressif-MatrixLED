@@ -2,8 +2,8 @@
 #include <CLedGameController.h>
 
 // Replace with your network credentials and local config
-const char* ssid     = "bf16162423";
-const char* password = "fr4r8uhma6";
+const char* ssid     = "---";
+const char* password = "---";
 const long Connect_Timeout = 20000;      //20 sec
 IPAddress local_IP(192, 168, 7, 144);
 IPAddress gateway(192, 168, 7, 1);
@@ -49,6 +49,7 @@ void setup()
 
     // Configure and init WiFi connection to router with static IP address
     bool isTimeout = false;
+    digitalWrite(LED_BUILTIN, HIGH);
     if (WiFi.config(local_IP, gateway, subnet))
     {
         unsigned long lLastTime = millis();
@@ -70,16 +71,14 @@ void setup()
         Serial.println(WiFi.localIP());
 #endif
     }
+    digitalWrite(LED_BUILTIN, LOW);
 
     m_ledsController = new CLedGameController(CS_PIN, NUM_DEVICES, IN_AXIS_X, IN_AXIS_Y, IN_BUTTON,
     #ifdef GAME_TETRIS    
-        EGame::Tetris);
+        EGame::Tetris, !isTimeout);
     #elif GAME_SNAKE
-        EGame::Snake);
+        EGame::Snake, !isTimeout);
     #endif
-
-    if (!isTimeout)
-        m_ledsController->CreateWebServer();
 
 #elif MARQUEE
     #ifdef DEBUG

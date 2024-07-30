@@ -52,8 +52,8 @@ void CLedGame::ReadUserControls()
     Serial.println(". Y: " + String((int)m_lastDirectionY));
 #endif
 
-    /*if (m_webServer != NULL)
-    {*/
+    if (m_webServer != NULL)
+    {
         m_webServer->HandleClient();
 
 #ifdef DEBUG
@@ -84,7 +84,13 @@ void CLedGame::ReadUserControls()
             m_lastDirectionX = EDirection::None;
             m_lastDirectionY = EDirection::Down;
         }
-    //}
+    }
+    else
+    {
+#ifdef DEBUG
+        Serial.println("No webServer as WiFi connection is offline");
+#endif
+    }
 }
 
 #endif

@@ -14,7 +14,7 @@ enum class EState { S_LOAD, S_SHOW, S_CALCULATE };
 class CLedGame
 {
 public:
-    CLedGame(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, CWebserver* webServer)
+    CLedGame(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, bool isWifiConnected)
     {
         // initialize variables
 #if IS_D1MINI
@@ -25,7 +25,10 @@ public:
         m_leds->begin();
         m_leds->control(MD_MAX72XX::INTENSITY, MAX_INTENSITY >> 4);
         m_iNumDevices = iNumDevices;
-        m_webServer = webServer;
+        if (isWifiConnected)
+            m_webServer = new CWebserver();
+        else
+            m_webServer = NULL;
 
         m_joystick = new CJoystick(iPinAxisX, iPinAxisY, iPinButton);
         m_lastDirectionX = EDirection::None;
@@ -62,7 +65,7 @@ protected:
 class CLedGameTetris : public CLedGame
 {
 public:
-    CLedGameTetris(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, CWebserver* webServer) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, webServer)
+    CLedGameTetris(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, bool isWifiConnected) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, isWifiConnected)
     {
         // m_leds->setBuffer(1, sizeof(Pieces[0]), Pieces[0]);
         // m_leds->setBuffer(4, sizeof(Pieces[0]), Pieces[1]);
@@ -101,7 +104,7 @@ private:
 class CLedGameSnake : public CLedGame
 {
 public:
-    CLedGameSnake(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, CWebserver* webServer) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, webServer)
+    CLedGameSnake(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, bool isWifiConnected) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, isWifiConnected)
     {
         m_Snake = new LinkedList<LongCoordinateXY*>();
         ResetGame();                            //implicitly starts with level 3 with 3 dots for the snake

@@ -6,7 +6,7 @@ void CWebserver::ReadControl()
     String control = m_server->arg("key");
     if (m_server->method() == HTTP_GET)
     {
-        //EDirection { None, Left, Right, Up, Down };
+        //equivalent integers to EDirection { None, Left, Right, Up, Down };
         if (control == "left")
             m_Direction = 1;
         else if (control == "right")
@@ -17,10 +17,17 @@ void CWebserver::ReadControl()
             m_Direction = 4;
         else
             m_Direction = 0;
+#ifdef DEBUG
+    Serial.println("Key read through GET method");
+#endif
+        this->HandleRoot(); //just show the main page again
     }
     else if (m_server->method() == HTTP_POST)
     {
         //TODO: implement POST processing
+#ifdef DEBUG
+    Serial.println("Key read through POST method");
+#endif
     }
 #ifdef DEBUG
     Serial.println("Read key: " + control);
@@ -40,14 +47,14 @@ void CWebserver::HandleRoot()
 
     m_server->send(200, "text/html", response);
 #ifdef DEBUG
-    Serial.println("Index page called: " + response);
+    Serial.println("Main \"/\" page called");
 #endif
 }
 
 void CWebserver::HandleNotFound()
 {
-    m_server->send(404, "text/html", "<h1>404: Page Not found</h1>");
+    m_server->send(404, "text/html", "<h2>404: Page Not found</h2>");
 #ifdef DEBUG
     Serial.println("Error 404 page called");
-#endif    
+#endif
 }
