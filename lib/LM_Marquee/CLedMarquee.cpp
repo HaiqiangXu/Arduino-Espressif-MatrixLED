@@ -417,7 +417,7 @@ void CLedMarquee::ShowPacman()
         bInit = false;
 
         // Lay out the initial dots
-        for (uint8_t i = 0; i < m_iNumDevices; i++)
+        for (int i = 0; i < m_iNumDevices; i++)
         {
             m_leds->setPoint(3, (i * COL_SIZE) + 5, true);
             m_leds->setPoint(4, (i * COL_SIZE) + 5, true);
@@ -427,11 +427,11 @@ void CLedMarquee::ShowPacman()
     }
 
     // clear old graphic
-    for (uint8_t i = 0; i < DATA_WIDTH; i++)
+    for (int i = 0; i < DATA_WIDTH; i++)
         m_leds->setColumn(idx - DATA_WIDTH + i, 0);
     // move reference column and draw new graphic
     idx++;
-    for (uint8_t i = 0; i < DATA_WIDTH; i++)
+    for (int i = 0; i < DATA_WIDTH; i++)
         m_leds->setColumn(idx - DATA_WIDTH + i, pacman[frame][i]);
     // advance the animation frame
     frame += deltaFrame;

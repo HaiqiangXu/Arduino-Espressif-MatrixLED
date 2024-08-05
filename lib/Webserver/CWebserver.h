@@ -35,17 +35,19 @@ public:
     // Public methods
     void HandleClient()
     {   
-        //handleClient and reset the direction
+        //handleClient for any new connection/browser connecting to board's webserver
         m_server->handleClient();
-        //TODO: see where to reset m_Direction
-        //m_Direction = 0;
     };
+    void ResetDirection()
+    {
+        m_Direction = 0;
+    }
     void ReadControl();
     void HandleRoot();
     void HandleNotFound();
 
     // Data accessors
-    int ReadDirection()
+    int GetDirection()
     {
         return m_Direction;
     };

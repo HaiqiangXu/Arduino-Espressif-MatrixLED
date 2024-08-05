@@ -8,7 +8,7 @@ class CLedGameController
 {
 public:
     // Constructors
-    CLedGameController(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, EGame newGame, bool isWifiConnected)
+    CLedGameController(int csPin, int iNumDevices, int iPinAxisX, int iPinAxisY, int iPinButton, EGame newGame, bool isWifiConnected)
     {
         m_currentGame = newGame;
         if (newGame == EGame::Tetris)

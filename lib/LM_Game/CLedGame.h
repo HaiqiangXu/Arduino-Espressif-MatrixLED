@@ -5,16 +5,17 @@
 #include <CCommon.h>
 #include <CJoystick.h>
 #include <CWebserver.h>
+#include <ESP8266TrueRandom.h>
 
 const unsigned long TIME_TO_POWER_DOWN = 60000;     //1 minute
-const uint8_t MAX_SNAKE_LENGTH = 16;
+const int MAX_SNAKE_LENGTH = 16;
 enum class EState { S_LOAD, S_SHOW, S_CALCULATE };
 
 // abstract base class
 class CLedGame
 {
 public:
-    CLedGame(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, bool isWifiConnected)
+    CLedGame(int csPin, int iNumDevices, int iPinAxisX, int iPinAxisY, int iPinButton, bool isWifiConnected)
     {
         // initialize variables
 #if IS_D1MINI
@@ -39,7 +40,7 @@ public:
     void StartGame();
 
     // Data accessors
-    uint8_t GetNumDevices()
+    int GetNumDevices()
     {
         return m_iNumDevices;
     };
@@ -48,10 +49,10 @@ protected:
     MD_MAX72XX* m_leds;
     CJoystick* m_joystick;
     CWebserver* m_webServer;
-    uint8_t m_iNumDevices;
+    int m_iNumDevices;
     EDirection m_lastDirectionX, m_lastDirectionY, m_lastDirection;
     int m_iButtonZ;
-    uint8_t m_iCurrentLevel;
+    int m_iCurrentLevel;
     unsigned long m_lLastTime;
 
     // Protected methods
@@ -65,7 +66,7 @@ protected:
 class CLedGameTetris : public CLedGame
 {
 public:
-    CLedGameTetris(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, bool isWifiConnected) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, isWifiConnected)
+    CLedGameTetris(int csPin, int iNumDevices, int iPinAxisX, int iPinAxisY, int iPinButton, bool isWifiConnected) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, isWifiConnected)
     {
         // m_leds->setBuffer(1, sizeof(Pieces[0]), Pieces[0]);
         // m_leds->setBuffer(4, sizeof(Pieces[0]), Pieces[1]);
@@ -80,7 +81,7 @@ public:
 
 private:
     // fields
-    // const uint8_t PROGMEM Pieces[6][2] = 
+    // const int PROGMEM Pieces[6][2] = 
     // {
     //     {0b00011000, 0b00011000},       //PieceSquare
     //     {0b00010000, 0b00111000},       //PieceTriangle
@@ -89,10 +90,10 @@ private:
     //     {0b00001000, 0b00111000},       //PieceLeftGun
     //     {0b00100000, 0b00111000}        //PieceRightGun
     // };
-    // const uint8_t PROGMEM PieceStick = 0b00111100;
+    // const int PROGMEM PieceStick = 0b00111100;
     
     EState m_state;
-    uint8_t m_currentPiece[2];
+    int m_currentPiece[2];
 
     // private methods
     virtual void RefreshAnimation();
@@ -104,16 +105,16 @@ private:
 class CLedGameSnake : public CLedGame
 {
 public:
-    CLedGameSnake(uint8_t csPin, uint8_t iNumDevices, uint8_t iPinAxisX, uint8_t iPinAxisY, uint8_t iPinButton, bool isWifiConnected) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, isWifiConnected)
+    CLedGameSnake(int csPin, int iNumDevices, int iPinAxisX, int iPinAxisY, int iPinButton, bool isWifiConnected) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, isWifiConnected)
     {
-        m_Snake = new LinkedList<LongCoordinateXY*>();
+        m_Snake = new LinkedList<IntCoordinateXY*>();
         ResetGame();                            //implicitly starts with level 3 with 3 dots for the snake
         SetNewEgg();
     };
 
 private:
-    LinkedList<LongCoordinateXY*>* m_Snake;
-    LongCoordinateXY m_Egg;
+    LinkedList<IntCoordinateXY*>* m_Snake;
+    IntCoordinateXY m_Egg;
     virtual void RefreshAnimation();
     virtual void GameCalculate();
     virtual void ResetGame();

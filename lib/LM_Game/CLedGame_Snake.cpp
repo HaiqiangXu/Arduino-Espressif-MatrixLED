@@ -5,11 +5,11 @@
 // Protected derived virtual methods
 void CLedGameSnake::RefreshAnimation()
 {
-    LongCoordinateXY* currItem;
+    IntCoordinateXY* currItem;
 
     m_leds->clear();
     m_leds->update(MD_MAX72XX::OFF);
-    for (uint8_t i = 0; i < m_iCurrentLevel; i++)
+    for (int i = 0; i < m_iCurrentLevel; i++)
     {
         currItem = m_Snake->get(i);
         m_leds->setPoint(currItem->x, currItem->y, true);
@@ -26,7 +26,10 @@ void CLedGameSnake::RefreshAnimation()
 void CLedGameSnake::GameCalculate()
 {
 #ifdef DEBUG
-    Serial.print("Previous direction: " + String((int)m_lastDirection));
+    if (m_lastDirectionX != EDirection::None)
+        Serial.println("Previous direction X: " + String((int)m_lastDirection) + ". Set direction X: " + String((int)m_lastDirectionX));
+    else if (m_lastDirectionY != EDirection::None)
+        Serial.println("Previous direction Y: " + String((int)m_lastDirection) + ". Set direction Y: " + String((int)m_lastDirectionY));
 #endif
 
     SetNextSnakePos(m_lastDirection);               //set last direction by default
@@ -39,6 +42,9 @@ void CLedGameSnake::GameCalculate()
             SetNextSnakePos(m_lastDirectionX);
             m_lastDirection = m_lastDirectionX;
         }
+    
+        if (m_webServer != NULL)
+            m_webServer->ResetDirection();
     }
     else if (m_lastDirectionY != EDirection::None)
     {
@@ -49,17 +55,16 @@ void CLedGameSnake::GameCalculate()
             SetNextSnakePos(m_lastDirectionY);
             m_lastDirection = m_lastDirectionY;
         }
-    }
 
-#ifdef DEBUG
-    Serial.println(". Set direction: " + String((int)m_lastDirection));
-#endif
+        if (m_webServer != NULL)
+            m_webServer->ResetDirection();
+    }
 }
 
 void CLedGameSnake::ResetGame()
 {
-    LongCoordinateXY* item;
-    for (uint8_t i = 0; i < m_Snake->size(); i++)
+    IntCoordinateXY* item;
+    for (int i = 0; i < m_Snake->size(); i++)
     {
         item = m_Snake->shift();            //destroy all objects inside list
         delete item;
@@ -69,21 +74,21 @@ void CLedGameSnake::ResetGame()
     m_lastDirection = EDirection::Left;     //default initial direction
 
 #ifdef DEBUG
-    m_Snake->add(new LongCoordinateXY { 4, 12 });
-    m_Snake->add(new LongCoordinateXY { 4, 11 });
-    m_Snake->add(new LongCoordinateXY { 4, 10 });
+    m_Snake->add(new IntCoordinateXY { 4, 12 });
+    m_Snake->add(new IntCoordinateXY { 4, 11 });
+    m_Snake->add(new IntCoordinateXY { 4, 10 });
 #else
-    item = new LongCoordinateXY { 4, random((COL_SIZE * m_iNumDevices) - 3) };
+    item = new IntCoordinateXY { 4, ESP8266TrueRandom.random((COL_SIZE * m_iNumDevices) - 3) };
     m_Snake->add(item);
-    if (random(2) == 0l)
+    if (ESP8266TrueRandom.random(2) == 0l)
     {
-        m_Snake->add(new LongCoordinateXY {(item->x) + 1, item->y});
-        m_Snake->add(new LongCoordinateXY {(item->x) + 2, item->y});
+        m_Snake->add(new IntCoordinateXY {(item->x) + 1, item->y});
+        m_Snake->add(new IntCoordinateXY {(item->x) + 2, item->y});
     }
     else
     {
-        m_Snake->add(new LongCoordinateXY {item->x, (item->y) - 1});
-        m_Snake->add(new LongCoordinateXY {item->x, (item->y) - 2});
+        m_Snake->add(new IntCoordinateXY {item->x, (item->y) - 1});
+        m_Snake->add(new IntCoordinateXY {item->x, (item->y) - 2});
     }
 #endif
 }
@@ -94,12 +99,12 @@ void CLedGameSnake::SetNewEgg()
     //TODO: control to not overlay existing snake dot
 #ifndef DEBUG
     bool bIsOk = false;
-    LongCoordinateXY* item;
+    IntCoordinateXY* item;
     do
     {
         //keep searching while new egg position is not outside the snake
-        m_Egg = LongCoordinateXY { random(ROW_SIZE), random((COL_SIZE * m_iNumDevices)) };
-        for (uint8_t i = 0; i < m_iCurrentLevel; i++)
+        m_Egg = IntCoordinateXY { ESP8266TrueRandom.random(ROW_SIZE), ESP8266TrueRandom.random((COL_SIZE * m_iNumDevices)) };
+        for (int i = 0; i < m_iCurrentLevel; i++)
         {
             item = m_Snake->get(i);
             if (item->x == m_Egg.x &&
@@ -118,11 +123,11 @@ void CLedGameSnake::SetNewEgg()
 
 void CLedGameSnake::SetNextSnakePos(EDirection direction)
 {
-    LongCoordinateXY *firstItem, *newItem, *lastItem;
+    IntCoordinateXY *firstItem, *newItem, *lastItem;
 
     lastItem = m_Snake->pop();       //remove last item
     firstItem = m_Snake->get(0);
-    newItem = new LongCoordinateXY {firstItem->x, firstItem->y};
+    newItem = new IntCoordinateXY { firstItem->x, firstItem->y };
     switch (direction)
     {
         case EDirection::Left:
@@ -161,9 +166,9 @@ void CLedGameSnake::SetNextSnakePos(EDirection direction)
     }
 
     //reset game if snake goes outside borders or crashes with itself
-    LongCoordinateXY* item;
+    IntCoordinateXY* item;
     bool bIsOk = true;
-    for (uint8_t i = 1; i < m_iCurrentLevel; i++)
+    for (int i = 1; i < m_iCurrentLevel; i++)
     {
         item = m_Snake->get(i);
         if (item->x == newItem->x &&

@@ -37,49 +37,34 @@ void CLedGame::StartGame()
 // Protected methods
 void CLedGame::ReadUserControls()
 {
-    // Read inputs from user
-    m_iButtonZ = m_joystick->ReadButton();
-
-    //we don't need values for axis (X, Y) because we just need direction
-    m_joystick->ReadAxisX();
-	m_joystick->ReadAxisY();
-    
-    //set changes to corresponding led
-    m_lastDirectionX = m_joystick->GetDirectionX();
-    m_lastDirectionY = m_joystick->GetDirectionY();
-#ifdef DEBUG
-    Serial.print("Reading Direction from Joystick X: " + String((int)m_lastDirectionX));
-    Serial.println(". Y: " + String((int)m_lastDirectionY));
-#endif
-
     if (m_webServer != NULL)
     {
         m_webServer->HandleClient();
-
+        int direction = m_webServer->GetDirection();
 #ifdef DEBUG
-        Serial.println("Reading Direction from webServer: " + String(m_webServer->ReadDirection()));
-#endif
-        if (m_webServer->ReadDirection() == 0)
+        Serial.println("Reading Direction from webServer: " + String(direction));
+#endif            
+        if (direction == 0)
         {
             m_lastDirectionX = EDirection::None;
             m_lastDirectionY = EDirection::None;
         }
-        else if (m_webServer->ReadDirection() == 1)
+        else if (direction == 1)
         {
             m_lastDirectionX = EDirection::Left;
             m_lastDirectionY = EDirection::None;
         }
-        else if (m_webServer->ReadDirection() == 2)
+        else if (direction == 2)
         {
             m_lastDirectionX = EDirection::Right;
             m_lastDirectionY = EDirection::None;
         }
-        else if (m_webServer->ReadDirection() == 3)
+        else if (direction == 3)
         {
             m_lastDirectionX = EDirection::None;
             m_lastDirectionY = EDirection::Up;
         }
-        else if (m_webServer->ReadDirection() == 4)
+        else if (direction == 4)
         {
             m_lastDirectionX = EDirection::None;
             m_lastDirectionY = EDirection::Down;
@@ -88,7 +73,21 @@ void CLedGame::ReadUserControls()
     else
     {
 #ifdef DEBUG
-        Serial.println("No webServer as WiFi connection is offline");
+        Serial.println("No webServer as WiFi connection is offline. Read direction from CJoystick...");
+#endif
+        digitalWrite(LED_BUILTIN, HIGH);
+
+        // Read inputs from user
+        m_iButtonZ = m_joystick->ReadButton();
+
+        //we don't need values for axis (X, Y) because we just need direction
+        m_joystick->ReadAxisX();
+        m_joystick->ReadAxisY();
+        m_lastDirectionX = m_joystick->GetDirectionX(); //default is 1 (Left) when no Joystick connected
+        m_lastDirectionY = m_joystick->GetDirectionY(); //default is 3 (Up) when no Joystick connected
+#ifdef DEBUG
+    Serial.print("Reading Direction from Joystick X: " + String((int)m_lastDirectionX));
+    Serial.println(". Y: " + String((int)m_lastDirectionY));
 #endif
     }
 }

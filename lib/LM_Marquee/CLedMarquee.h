@@ -1,6 +1,6 @@
 #include <MD_MAX72xx.h>
 
-const uint8_t IN_BTN = 2;
+const int IN_BTN = 2;
 const int DELAY_TIME = 100;     // milliseconds
 const int TIMEOUT_TIME = 3000;  // 3 seconds
 
@@ -10,7 +10,7 @@ class CLedMarquee
 {
 public:
     // Constructors
-    CLedMarquee(uint8_t csPin, uint8_t iNumDevices, EMarqueeStyle marquee)
+    CLedMarquee(int csPin, int iNumDevices, EMarqueeStyle marquee)
     {
         // initialize devices and variables
         pinMode(IN_BTN, INPUT_PULLUP);
@@ -28,7 +28,7 @@ public:
     void ShowMarquee();
 
     // Data accessors
-	uint8_t GetDevices()
+	int GetDevices()
 	{
 		return m_iNumDevices;
 	};
@@ -53,7 +53,7 @@ private:
     // Fields
     MD_MAX72XX* m_leds;
     EMarqueeStyle m_currentMarquee;
-    uint8_t m_iNumDevices;
+    int m_iNumDevices;
     const char* m_msgText, *m_msgTextIni;
 
     // Private methods

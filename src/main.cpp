@@ -2,35 +2,36 @@
 #include <CLedGameController.h>
 
 // Replace with your network credentials and local config
-const char* ssid     = "---";
-const char* password = "---";
-const long Connect_Timeout = 20000;      //20 sec
-IPAddress local_IP(192, 168, 7, 144);
-IPAddress gateway(192, 168, 7, 1);
-IPAddress subnet(255, 255, 255, 0);
+const char* ssid     = "bf16162423";
+const char* password = "fr4r8uhma6";
+const long Connect_Timeout = 10000;      //10 sec
+const IPAddress Local_IP(192, 168, 7, 144);
+const IPAddress Gateway(192, 168, 7, 1);
+const IPAddress Subnet(255, 255, 255, 0);
 
 #elif MARQUEE
 #include <CLedMarquee.h>
 #endif
 
 // Type uint8_t is equivalent to unsigned byte/char and it's native/fastest data type for Atmel 8-bit controllers (ATMega 328P). int is signed 16-bit and long signed 32-bit for these MCUs
+// Type int is 32-bit for ESP8266/ESP32 as they are 32-bit MCU architecture
 // D1 R1/Uno:        D1 Mini:
 // CLK_PIN = D13;    //D5       //SCK  [Master Clock]
 // DATA_PIN = D11;   //D7       //MOSI [Master Out Slave In]   
 // CS_PIN = D10;     //D8       //SS   [Slave Select]
 #if IS_ESP32
-const uint8_t CS_PIN = SS;
+const int CS_PIN = SS;
 #elif IS_D1MINI
-const uint8_t CLK_PIN = D5;
-const uint8_t DATA_PIN = D7;
-const uint8_t CS_PIN = D8;
+const int CLK_PIN = D5;
+const int DATA_PIN = D7;
+const int CS_PIN = D8;
 #else
-const uint8_t CS_PIN = D10;
+const int CS_PIN = D10;
 #endif
-const uint8_t IN_AXIS_X = 17;   //A3
-const uint8_t IN_AXIS_Y = 18;   //A4
-const uint8_t IN_BUTTON = 2;    //WakeUp Input -> press Joystick button if in sleep to wake the game up
-const uint8_t NUM_DEVICES = 2;  //number of Matrix leds attached
+const int IN_AXIS_X = 17;   //A3
+const int IN_AXIS_Y = 18;   //A4
+const int IN_BUTTON = 2;    //WakeUp Input -> press Joystick button if in sleep to wake the game up
+const int NUM_DEVICES = 2;  //number of Matrix leds attached
 const char TEXT[] = "Hello world";
 
 #ifdef GAME
@@ -49,8 +50,9 @@ void setup()
 
     // Configure and init WiFi connection to router with static IP address
     bool isTimeout = false;
+    pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, HIGH);
-    if (WiFi.config(local_IP, gateway, subnet))
+    if (WiFi.config(Local_IP, Gateway, Subnet))
     {
         unsigned long lLastTime = millis();
 
@@ -97,17 +99,14 @@ void loop()
 #ifdef GAME
     m_ledsController->StartGame();
 #elif MARQUEE
-    while (true)
-    {
-        m_ledsController->SetMarqueeStyle(EMarqueeStyle::Test);
-        m_ledsController->ShowMarquee();
-        delay(300);
-        m_ledsController->SetMarqueeStyle(EMarqueeStyle::Text);
-        m_ledsController->ShowMarquee();
-        delay(300);
-        m_ledsController->SetMarqueeStyle(EMarqueeStyle::Pacman);
-        m_ledsController->ShowMarquee();
-        delay(300);
-    }
+    m_ledsController->SetMarqueeStyle(EMarqueeStyle::Test);
+    m_ledsController->ShowMarquee();
+    delay(300);
+    m_ledsController->SetMarqueeStyle(EMarqueeStyle::Text);
+    m_ledsController->ShowMarquee();
+    delay(300);
+    m_ledsController->SetMarqueeStyle(EMarqueeStyle::Pacman);
+    m_ledsController->ShowMarquee();
+    delay(300);
 #endif
 }
