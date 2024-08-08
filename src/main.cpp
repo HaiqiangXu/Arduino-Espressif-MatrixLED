@@ -2,8 +2,8 @@
 #include <CLedGameController.h>
 
 // Replace with your network credentials and local config
-const char* ssid     = "bf16162423";
-const char* password = "fr4r8uhma6";
+const char* ssid     = "---";
+const char* password = "---";
 const long Connect_Timeout = 10000;      //10 sec
 const IPAddress Local_IP(192, 168, 7, 144);
 const IPAddress Gateway(192, 168, 7, 1);
@@ -50,6 +50,9 @@ void setup()
 
     // Configure and init WiFi connection to router with static IP address
     bool isTimeout = false;
+#ifdef IS_ESP32
+    pinMode(GPIO_NUM_33, INPUT_PULLUP);
+#endif
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, HIGH);
     if (WiFi.config(Local_IP, Gateway, Subnet))

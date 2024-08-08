@@ -6,12 +6,10 @@
 
 void CLedGame::StartGame()
 {
-    // consider idle if Joystick hasn't moved to call Power Down. Wake it up if Joystick button is pressed
-    if (m_joystick->GetDirectionX() != EDirection::None ||
-        m_joystick->GetDirectionY() != EDirection::None ||
-        m_iButtonZ == LOW)
+    if (m_lastDirectionX != EDirection::None ||
+        m_lastDirectionY != EDirection::None)
     {
-        //reset count to PowerDown
+        //reset count to DeepSleep whenever there is user interaction
         m_lLastTime = millis();
     }
     
@@ -25,8 +23,13 @@ void CLedGame::StartGame()
     {
         digitalWrite(LED_BUILTIN, HIGH);
         m_leds->clear();
-        //TODO: replace with LowerPower for ESP8266/ESP32:
-        //AtmelPower.PowerDownInt0();
+#ifdef IS_ESP32        
+        //wake-up input using D33 pin (GPIO33)
+        esp_deep_sleep_start();
+#else
+        //wake-up input using RST pin
+        ESP.deepSleep(0);
+#endif
         m_lLastTime = millis();     //it's important to reset the counter after wake up!
         digitalWrite(LED_BUILTIN, LOW);
     }

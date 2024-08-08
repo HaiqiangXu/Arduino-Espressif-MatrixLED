@@ -78,9 +78,15 @@ void CLedGameSnake::ResetGame()
     m_Snake->add(new IntCoordinateXY { 4, 11 });
     m_Snake->add(new IntCoordinateXY { 4, 10 });
 #else
+#ifdef IS_ESP32
+    item = new IntCoordinateXY { 4, random((COL_SIZE * m_iNumDevices) - 3) };
+    long randLong = random(2);
+#else
     item = new IntCoordinateXY { 4, ESP8266TrueRandom.random((COL_SIZE * m_iNumDevices) - 3) };
+    long randLong = ESP8266TrueRandom.random(2);
+#endif
     m_Snake->add(item);
-    if (ESP8266TrueRandom.random(2) == 0l)
+    if (randLong == 0l)
     {
         m_Snake->add(new IntCoordinateXY {(item->x) + 1, item->y});
         m_Snake->add(new IntCoordinateXY {(item->x) + 2, item->y});
@@ -103,7 +109,11 @@ void CLedGameSnake::SetNewEgg()
     do
     {
         //keep searching while new egg position is not outside the snake
+#ifdef IS_ESP32
+        m_Egg = IntCoordinateXY { random(ROW_SIZE), random((COL_SIZE * m_iNumDevices)) };
+#else
         m_Egg = IntCoordinateXY { ESP8266TrueRandom.random(ROW_SIZE), ESP8266TrueRandom.random((COL_SIZE * m_iNumDevices)) };
+#endif
         for (int i = 0; i < m_iCurrentLevel; i++)
         {
             item = m_Snake->get(i);

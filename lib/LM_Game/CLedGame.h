@@ -5,7 +5,9 @@
 #include <CCommon.h>
 #include <CJoystick.h>
 #include <CWebserver.h>
+#ifndef IS_ESP32
 #include <ESP8266TrueRandom.h>
+#endif
 
 const unsigned long TIME_TO_POWER_DOWN = 60000;     //1 minute
 const int MAX_SNAKE_LENGTH = 16;
@@ -20,6 +22,12 @@ public:
         // initialize variables
 #if IS_D1MINI
         m_leds = new MD_MAX72XX(MD_MAX72XX::FC16_HW, D7, D5, csPin, iNumDevices);
+#elif IS_ESP32
+        m_leds = new MD_MAX72XX(MD_MAX72XX::FC16_HW, MOSI, SCK, csPin, iNumDevices);
+
+        esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 0);
+        // touchAttachInterrupt(T3, NULL, 15);	//When the value read on T3 (GPIO 15) is lower than the value set on the Threshold variable, the ESP32 wakes up and callback function is executed
+        // esp_sleep_enable_touchpad_wakeup();
 #else
         m_leds = new MD_MAX72XX(MD_MAX72XX::FC16_HW, csPin, iNumDevices);
 #endif
