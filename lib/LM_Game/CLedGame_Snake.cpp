@@ -42,9 +42,6 @@ void CLedGameSnake::GameCalculate()
             SetNextSnakePos(m_lastDirectionX);
             m_lastDirection = m_lastDirectionX;
         }
-    
-        if (m_webServer != NULL)
-            m_webServer->ResetDirection();
     }
     else if (m_lastDirectionY != EDirection::None)
     {
@@ -55,9 +52,6 @@ void CLedGameSnake::GameCalculate()
             SetNextSnakePos(m_lastDirectionY);
             m_lastDirection = m_lastDirectionY;
         }
-
-        if (m_webServer != NULL)
-            m_webServer->ResetDirection();
     }
 }
 

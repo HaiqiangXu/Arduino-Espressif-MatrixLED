@@ -22,9 +22,9 @@ public:
     };
 
     // Public methods  
-    void StartGame()
+    void RefreshGame()
     {
-        m_ledGame->StartGame();
+        m_ledGame->RefreshGame();
     };
 
     // Data accessors

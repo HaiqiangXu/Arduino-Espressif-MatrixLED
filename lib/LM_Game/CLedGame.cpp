@@ -4,7 +4,7 @@
 
 #pragma region Public methods
 
-void CLedGame::StartGame()
+void CLedGame::RefreshGame()
 {
     if (m_lastDirectionX != EDirection::None ||
         m_lastDirectionY != EDirection::None)
@@ -17,6 +17,7 @@ void CLedGame::StartGame()
     this->RefreshAnimation();
     ReadUserControls();
     this->GameCalculate();
+    ResetWebserverDirection();
 
     // check if enter Power Down to save battery
     if (millis() - m_lLastTime >= TIME_TO_POWER_DOWN)
@@ -93,6 +94,13 @@ void CLedGame::ReadUserControls()
     Serial.println(". Y: " + String((int)m_lastDirectionY));
 #endif
     }
+}
+
+void CLedGame::ResetWebserverDirection()
+{
+    bool hasChangedDirection = m_lastDirectionX != EDirection::None || m_lastDirectionY != EDirection::None;
+    if (m_webServer != NULL && hasChangedDirection)
+        m_webServer->ResetDirection();
 }
 
 #endif

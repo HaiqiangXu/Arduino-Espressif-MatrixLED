@@ -15,10 +15,10 @@ const IPAddress Subnet(255, 255, 255, 0);
 
 // Type uint8_t is equivalent to unsigned byte/char and it's native/fastest data type for Atmel 8-bit controllers (ATMega 328P). int is signed 16-bit and long signed 32-bit for these MCUs
 // Type int is 32-bit for ESP8266/ESP32 as they are 32-bit MCU architecture
-// D1 R1/Uno:        D1 Mini:
-// CLK_PIN = D13;    //D5       //SCK  [Master Clock]
-// DATA_PIN = D11;   //D7       //MOSI [Master Out Slave In]   
-// CS_PIN = D10;     //D8       //SS   [Slave Select]
+// D1 R1/Uno:        D1 Mini:   DevKit-v1:   D1 R32:
+// CLK_PIN = D13;    //D5       //D18        //IO18       //SCK  [Master Clock]
+// DATA_PIN = D11;   //D7       //D23        //IO23       //MOSI [Master Out Slave In]   
+// CS_PIN = D10;     //D8       //D5         //IO5        //SS   [Slave Select]
 #if IS_ESP32
 const int CS_PIN = SS;
 #elif IS_D1MINI
@@ -51,7 +51,7 @@ void setup()
     // Configure and init WiFi connection to router with static IP address
     bool isTimeout = false;
 #ifdef IS_ESP32
-    pinMode(GPIO_NUM_33, INPUT_PULLUP);
+    pinMode(GPIO_NUM_27, INPUT_PULLUP);
 #endif
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, HIGH);
@@ -100,7 +100,7 @@ void setup()
 void loop()
 {
 #ifdef GAME
-    m_ledsController->StartGame();
+    m_ledsController->RefreshGame();
 #elif MARQUEE
     m_ledsController->SetMarqueeStyle(EMarqueeStyle::Test);
     m_ledsController->ShowMarquee();

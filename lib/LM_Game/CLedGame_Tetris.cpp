@@ -23,7 +23,7 @@ void CLedGameTetris::RefreshAnimation()
 
     m_leds->control(MD_MAX72XX::UPDATE, MD_MAX72XX::ON);
 
-    delay(250);
+    delay(300);         //this delay can be dynamic by regulating speed according to difficulty level
 }
 
 void CLedGameTetris::GameCalculate()

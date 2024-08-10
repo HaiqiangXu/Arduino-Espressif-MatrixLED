@@ -25,7 +25,9 @@ public:
 #elif IS_ESP32
         m_leds = new MD_MAX72XX(MD_MAX72XX::FC16_HW, MOSI, SCK, csPin, iNumDevices);
 
-        esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 0);
+        //NOTE: only RTC GPIO pins allowed as wake-up source. These include GPIOs 36, 39, 34, 35, 32, 33, 25, 26, 27, 14, 12, 13, 0, 15, 2, and 4
+        //Tested working: 33, 14, 27. Tested not working: 39, 34. Rest RTC GPIOs are not tested
+        esp_sleep_enable_ext0_wakeup(GPIO_NUM_27, 0);
         // touchAttachInterrupt(T3, NULL, 15);	//When the value read on T3 (GPIO 15) is lower than the value set on the Threshold variable, the ESP32 wakes up and callback function is executed
         // esp_sleep_enable_touchpad_wakeup();
 #else
@@ -45,7 +47,7 @@ public:
         m_iCurrentLevel = 0;
         m_lLastTime = millis();
     };
-    void StartGame();
+    void RefreshGame();
 
     // Data accessors
     int GetNumDevices()
@@ -65,6 +67,7 @@ protected:
 
     // Protected methods
     void ReadUserControls();
+    void ResetWebserverDirection();
     virtual void RefreshAnimation() = 0;   //pure virtual function -> to be implemented in the derived classes
     virtual void GameCalculate() = 0;
     virtual void ResetGame() = 0;
