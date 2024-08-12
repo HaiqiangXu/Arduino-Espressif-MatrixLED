@@ -12,6 +12,10 @@ public:
     // Constructors
     CWebserver()
     {
+        m_Direction = 0;
+        m_ButtonA = false;
+        m_ButtonB = false;
+
         // initialize HTTP Server
 #if IS_ESP32        
         m_server = new WebServer(80);
@@ -20,7 +24,6 @@ public:
         m_server->onNotFound([this]() { HandleNotFound(); });
         m_server->begin();
 #else
-        m_Direction = 0;
         m_server = new ESP8266WebServer(80);
         m_server->on("/", [this]() { HandleRoot(); });
         m_server->on("/control", [this]() { ReadControl(); });
@@ -42,6 +45,13 @@ public:
     {
         m_Direction = 0;
     }
+    void ResetButton(bool isA)
+    {
+        if (isA)
+            m_ButtonA = false;
+        else
+            m_ButtonB = false;
+    }
     void ReadControl();
     void HandleRoot();
     void HandleNotFound();
@@ -50,6 +60,14 @@ public:
     int GetDirection()
     {
         return m_Direction;
+    };
+    bool GetButtonA()
+    {
+        return m_ButtonA;
+    };
+    bool GetButtonB()
+    {
+        return m_ButtonB;
     };
 
 private:
@@ -60,6 +78,8 @@ private:
     ESP8266WebServer* m_server;
 #endif
     int m_Direction;
-
+    bool m_ButtonA;
+    bool m_ButtonB;
+    
     // Private methods
 };

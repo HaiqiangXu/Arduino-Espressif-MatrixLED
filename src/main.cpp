@@ -21,16 +21,22 @@ const IPAddress Subnet(255, 255, 255, 0);
 // CS_PIN = D10;     //D8       //D5         //IO5        //SS   [Slave Select]
 #if IS_ESP32
 const int CS_PIN = SS;
+const int IN_BUTTON = T6;   //GPIO14
+const int IN_AXIS_X = T5;   //GPIO12
+const int IN_AXIS_Y = T4;   //GPIO13
 #elif IS_D1MINI
 const int CLK_PIN = D5;
 const int DATA_PIN = D7;
 const int CS_PIN = D8;
+const int IN_BUTTON = A0;   //only one ADC available, so when using ESP82866 control gaming with webserver. If HW solution needed, then use 4051 multiplexer (https://www.instructables.com/How-to-Use-Multiple-Analog-Sensors-on-Your-ESP8266)
+const int IN_AXIS_X = 17;
+const int IN_AXIS_Y = 18;
 #else
 const int CS_PIN = D10;
+const int IN_BUTTON = A0;
+const int IN_AXIS_X = 17;
+const int IN_AXIS_Y = 18;
 #endif
-const int IN_AXIS_X = 17;   //A3
-const int IN_AXIS_Y = 18;   //A4
-const int IN_BUTTON = 2;    //WakeUp Input -> press Joystick button if in sleep to wake the game up
 const int NUM_DEVICES = 2;  //number of Matrix leds attached
 const char TEXT[] = "Hello world";
 
@@ -44,7 +50,11 @@ void setup()
 {
 #ifdef GAME
     #ifdef DEBUG
+    #ifdef IS_ESP32
+        Serial.begin(115200);
+    #else
         Serial.begin(9600);
+    #endif        
         Serial.println("Debugging Led Matrix game");
     #endif
 
@@ -68,10 +78,12 @@ void setup()
         {
             delay(300);
             isTimeout = millis() - lLastTime >= Connect_Timeout;
-            lLastTime = millis();
         }
 #ifdef DEBUG
-        Serial.println("Connection OK.");
+        if (isTimeout)
+            Serial.println("Connection NOK Timeout.");
+        else
+            Serial.println("Connection OK.");
         Serial.print("Board IP address: ");
         Serial.println(WiFi.localIP());
 #endif

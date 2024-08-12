@@ -2,6 +2,8 @@
 
 #include "CLedGame.h"
 
+const int MAX_SNAKE_LENGTH = 16;
+
 // Protected derived virtual methods
 void CLedGameSnake::RefreshAnimation()
 {
