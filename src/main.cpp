@@ -28,7 +28,7 @@ const int IN_AXIS_Y = T4;   //GPIO13
 const int CLK_PIN = D5;
 const int DATA_PIN = D7;
 const int CS_PIN = D8;
-const int IN_BUTTON = A0;   //only one ADC available, so when using ESP82866 control gaming with webserver. If HW solution needed, then use 4051 multiplexer (https://www.instructables.com/How-to-Use-Multiple-Analog-Sensors-on-Your-ESP8266)
+const int IN_BUTTON = A0;   //only one ADC available, so when using ESP82866 the gaming control through webserver. If HW solution needed, then use 4051 multiplexer (https://www.instructables.com/How-to-Use-Multiple-Analog-Sensors-on-Your-ESP8266)
 const int IN_AXIS_X = 17;
 const int IN_AXIS_Y = 18;
 #else

@@ -15,13 +15,16 @@ void CWebserver::ReadControl()
             m_Direction = 3;
         else if (control == "down")
             m_Direction = 4;
-        else if (control == "BtnA")
+        else if (control == "btnA")
             m_ButtonA = true;
-        else if (control == "BtnB")
+        else if (control == "btnB")
             m_ButtonB = true;
+        else if (control == "btnStart")
+            m_ButtonStart = true;
         else
         {
             m_Direction = 0;
+            m_ButtonStart = false;
             m_ButtonA = false;
             m_ButtonB = false;
         }
@@ -46,9 +49,12 @@ void CWebserver::ReadControl()
             m_ButtonA = true;
         else if (control == "btnB")
             m_ButtonB = true;
+        else if (control == "btnStart")
+            m_ButtonStart = true;
         else
         {
             m_Direction = 0;
+            m_ButtonStart = false;
             m_ButtonA = false;
             m_ButtonB = false;
         }
@@ -77,8 +83,8 @@ void CWebserver::HandleRoot()
     // response += "<p><a href=\"/control?key=left\"><button class=\"button\">Left</button></a></p>";
     // response += "<p><a href=\"/control?key=right\"><button class=\"button\">Right</button></a></p>";
     //Using POST Method
-    response += "<div class=\"container text-center\"><div class=\"row row-cols-3\"><div class=\"col-5\"></div><div class=\"col-2\"><button type=\"button\" class=\"btn btn-primary\" onclick=\"proceed('up');\"><i class=\"fa fa-arrow-up fa-2x\"></i></button></div><div class=\"col-5\"></div></div>";
-    response += "<div class=\"row row-cols-3\"><div class=\"col-4\"></div><div class=\"col-1\"></div><div class=\"col-1\"><button type=\"button\" class=\"btn btn-primary\" onclick=\"proceed2('left');\"><i class=\"fa fa-arrow-left fa-2x\"></i></button></div><div class=\"col-1\"><button type=\"button\" class=\"btn btn-primary\" onclick=\"proceed2('right');\"><i class=\"fa fa-arrow-right fa-2x\"></i></button></div><div class=\"col-1\"></div><div class=\"col-4\"></div></div>";
+    response += "<div class=\"container text-center\"><div class=\"row row-cols-3\"><div class=\"col-5\"></div><div class=\"col-2\"><button type=\"button\" class=\"btn btn-primary\" onclick=\"proceed('up');\"><i class=\"fa fa-arrow-up fa-2x\"></i></button></div><div class=\"col-2\"><button type=\"button\" class=\"btn btn-outline-primary\" onclick=\"proceed('btnStart');\"><i class=\"fa fa-play fa-2x\"></i></button></div><div class=\"col-3\"></div></div>";
+    response += "<div class=\"row row-cols-3\"><div class=\"col-5\"></div><div class=\"col-1\"><button type=\"button\" class=\"btn btn-primary\" onclick=\"proceed2('left');\"><i class=\"fa fa-arrow-left fa-2x\"></i></button></div><div class=\"col-1\"><button type=\"button\" class=\"btn btn-primary\" onclick=\"proceed2('right');\"><i class=\"fa fa-arrow-right fa-2x\"></i></button></div><div class=\"col-5\"></div></div>";
     response += "<div class=\"row row-cols-3\"><div class=\"col-5\"></div><div class=\"col-2\"><button type=\"button\" class=\"btn btn-primary\" onclick=\"proceed('down');\"><i class=\"fa fa-arrow-down fa-2x\"></i></button></div><div class=\"col-2\"><button type=\"button\" class=\"btn btn-outline-primary\" onclick=\"proceed('btnA');\"><i class=\"fa fa-plus-circle fa-2x\"></i></button><button type=\"button\" class=\"btn btn-outline-primary\" onclick=\"proceed('btnB');\"><i class=\"fa fa-minus-circle fa-2x\"></i></button></div><div class=\"col-3\"></div></div>";
     response += "<div class=\"row row-cols-3\"><div class=\"col-3\"></div><div class=\"col-6\"><div class=\"text-right\">Control pressed: <div id=\"lastControl\"></div></div></div><div class=\"col-3\"></div></div></div>";
     response += "</body></html>";

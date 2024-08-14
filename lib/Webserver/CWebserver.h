@@ -13,6 +13,7 @@ public:
     CWebserver()
     {
         m_Direction = 0;
+        m_ButtonStart = false;
         m_ButtonA = false;
         m_ButtonB = false;
 
@@ -45,6 +46,10 @@ public:
     {
         m_Direction = 0;
     }
+    void ResetStart()
+    {
+        m_ButtonStart = false;
+    }
     void ResetButton(bool isA)
     {
         if (isA)
@@ -60,6 +65,10 @@ public:
     int GetDirection()
     {
         return m_Direction;
+    };
+    bool GetButtonStart()
+    {
+        return m_ButtonStart;
     };
     bool GetButtonA()
     {
@@ -78,6 +87,7 @@ private:
     ESP8266WebServer* m_server;
 #endif
     int m_Direction;
+    bool m_ButtonStart;
     bool m_ButtonA;
     bool m_ButtonB;
     

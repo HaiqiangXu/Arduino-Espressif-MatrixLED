@@ -1,6 +1,6 @@
 #ifdef GAME
 
-#include "CLedGame_TetrisBase.h"
+#include "CLedGame_TetrisPiece.h"
 
 // abstract base class
 class CLedGame
@@ -52,7 +52,7 @@ protected:
     CWebserver* m_webServer;
     int m_iNumDevices;
     EDirection m_lastDirectionX, m_lastDirectionY, m_lastDirection;
-    bool m_ButtonA, m_ButtonB;
+    bool m_ButtonStart, m_ButtonA, m_ButtonB;
     int m_iButtonZ;
     int m_iCurrentLevel;
     unsigned long m_lLastTime;
@@ -71,15 +71,15 @@ class CLedGameTetris : public CLedGame
 public:
     CLedGameTetris(int csPin, int iNumDevices, int iPinAxisX, int iPinAxisY, int iPinButton, bool isWifiConnected) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, isWifiConnected)
     {
-        m_CurrPiece = new CLedGameTetrisPiece(m_leds->getColumnCount());
-        m_Base = new CLedGameTetrisBase();
+        m_CurrPiece = new CLedGameTetrisPiece();
+        m_Base = new LinkedList<IntCoordinateXY*>();
         ResetGame();
     };
 
 private:
     // fields
     CLedGameTetrisPiece* m_CurrPiece;
-    CLedGameTetrisBase* m_Base;
+    LinkedList<IntCoordinateXY*>* m_Base;
 
     // protected methods
     virtual void RefreshAnimation();
@@ -87,7 +87,9 @@ private:
     virtual void ResetGame();
 
     // private methods
-
+    void AddPieceToBase();
+    void CreateNewPiece(bool resetBase);
+    bool CheckPiece();
 };
 
 // derived class for Snake game. Finish CLedGame_Snake.cpp by adding remaining methods RefreshAnimation() and GameCalculate()

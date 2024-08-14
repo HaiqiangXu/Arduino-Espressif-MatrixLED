@@ -14,9 +14,8 @@ enum class EPieceType { Triangle, BigLine, Square, LInverted, LShape, ZShape, ZI
 class CLedGameTetrisPiece
 {
 public:
-    CLedGameTetrisPiece(int ledsColumnCount)
+    CLedGameTetrisPiece()
     {
-        m_ledsColumnCount = ledsColumnCount;
         m_CurrPiece = new LinkedList<IntCoordinateXY*>();
     };
     void NewPiece();
@@ -34,21 +33,11 @@ public:
                 m_CurrPieceBoxLeft++;
         }
     };
-    bool MoveVerticalPiece(int currentLevel)
-    {
-        int maxPieceY = currentLevel + m_CurrPieceBoxHeight;
-        if (maxPieceY > m_ledsColumnCount)
-        {
-            NewPiece();
-            return true;
-        }
-
-        return false;
-    }
 
     // Data accessors
     LinkedList<IntCoordinateXY*>* GetCoordinates()
     {
+        //TODO: improve how to access to coordinates of the piece
         return m_CurrPiece;
     };
 
@@ -56,12 +45,15 @@ public:
     {
         return m_CurrPieceBoxLeft;
     };
+    int GetHeight()
+    {
+        return m_CurrPieceBoxHeight;
+    };
 
 private:
     // fields
     LinkedList<IntCoordinateXY*>* m_CurrPiece;
     EPieceType m_CurrPieceType;
-    int m_ledsColumnCount;
     int m_CurrPieceBoxLeft;
     int m_CurrPieceBoxWidth;
     int m_CurrPieceBoxHeight;

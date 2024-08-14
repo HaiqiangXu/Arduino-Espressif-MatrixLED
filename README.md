@@ -1,8 +1,7 @@
 # Arduino-Espressif-MatrixLED
 Software for Espressif8266/ESP32 MCUs to control 8x8 dot matrix LED based on MAX7219 ICs in FC-16 boards with led matrix model 1088AS
 
-<img src="doc/img/fc-16_1088AS.jpg" width="20%" alt="FC-16_1088AS">
-<img src="doc/img/fc-16_2leds_matrix.jpg" width="20%" alt="TwoLeds_matrix">
+<img src="doc/img/fc-16_1088AS.jpg" width="30%" alt="FC-16_1088AS"> | <img src="doc/img/fc-16_2leds_matrix.jpg" width="30%" alt="TwoLeds_matrix">
 
 ## Features
 - Configurable matrix size by attaching multiple LED Matrixes
@@ -57,7 +56,7 @@ Arduino-Generic-Libraries
 
 ### Build schematics
 | **Compatible board** | **Schematics** |
-| ----------- | ------------------- |
+| -------------------- | :------------: |
 | Wemos D1 [ESP8266] | <img src="doc/img/d1-schematics.jpg" width="50%" alt="D1_Schematics"> |
 | Wemos D1 Mini [ESP8266] | <img src="doc/img/d1-mini-schematics.jpg" width="50%" alt="D1_Mini_Schematics"> |
 | Wemos DevKit V1 [ESP32] | <img src="doc/img/devkitv1-schematics.jpg" width="50%" alt="DevkitV1_Schematics"> |

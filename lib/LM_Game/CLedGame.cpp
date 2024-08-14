@@ -49,7 +49,7 @@ void CLedGame::ReadUserControls()
         int direction = m_webServer->GetDirection();
 #ifdef DEBUG
         if (direction != 0)
-            Serial.println("Reading Direction from webServer: " + String(direction));
+            Serial.println("Reading Direction from WebServer: " + String(direction));
 #endif
         //TODO: read from buffer (Queue) of commands
         if (direction == 0)
@@ -78,9 +78,12 @@ void CLedGame::ReadUserControls()
             m_lastDirectionY = EDirection::Down;
         }
 
+        m_ButtonStart = m_webServer->GetButtonStart();
         m_ButtonA = m_webServer->GetButtonA();
         m_ButtonB = m_webServer->GetButtonB();
 #ifdef DEBUG
+        if (m_ButtonStart)
+            Serial.println("Start button has been pressed");
         if (m_ButtonA || m_ButtonB)
             Serial.println("A button has been pressed");
 #endif        
@@ -88,7 +91,7 @@ void CLedGame::ReadUserControls()
     else
     {
 #ifdef DEBUG
-        Serial.println("No webServer as WiFi connection is offline. Read direction from CJoystick...");
+        Serial.println("No WebServer as WiFi connection is offline. Read direction from CJoystick...");
 #endif
         digitalWrite(LED_BUILTIN, HIGH);
 
@@ -114,6 +117,8 @@ void CLedGame::ResetWebserverDirection()
     {
         if (hasChangedDirection)
             m_webServer->ResetDirection();
+        if (m_webServer->GetButtonStart())
+            m_webServer->ResetStart();
         if (m_webServer->GetButtonA())
             m_webServer->ResetButton(true);
         if (m_webServer->GetButtonB())
