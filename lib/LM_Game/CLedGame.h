@@ -11,6 +11,8 @@ public:
         // initialize variables
 #if IS_D1MINI
         m_leds = new MD_MAX72XX(MD_MAX72XX::FC16_HW, D7, D5, csPin, iNumDevices);
+#elif IS_NODEMCU
+        m_leds = new MD_MAX72XX(MD_MAX72XX::FC16_HW, D1, D2, csPin, iNumDevices);
 #elif IS_ESP32
         m_leds = new MD_MAX72XX(MD_MAX72XX::FC16_HW, MOSI, SCK, csPin, iNumDevices);
 
@@ -72,14 +74,16 @@ public:
     CLedGameTetris(int csPin, int iNumDevices, int iPinAxisX, int iPinAxisY, int iPinButton, bool isWifiConnected) : CLedGame(csPin, iNumDevices, iPinAxisX, iPinAxisY, iPinButton, isWifiConnected)
     {
         m_CurrPiece = new CLedGameTetrisPiece();
-        m_Base = new LinkedList<IntCoordinateXY*>();
+        m_Base = new bool*[8];  //fix width of 8 pixels
+        for (int x = 0; x < 8; x++)
+            m_Base[x] = new bool[m_iNumDevices * 8];
         ResetGame();
     };
 
 private:
     // fields
     CLedGameTetrisPiece* m_CurrPiece;
-    LinkedList<IntCoordinateXY*>* m_Base;
+    bool** m_Base;
 
     // protected methods
     virtual void RefreshAnimation();
@@ -89,7 +93,7 @@ private:
     // private methods
     void AddPieceToBase();
     void CreateNewPiece(bool resetBase);
-    bool CheckPiece();
+    void RemoveBaseCompleteLines();
 };
 
 // derived class for Snake game. Finish CLedGame_Snake.cpp by adding remaining methods RefreshAnimation() and GameCalculate()

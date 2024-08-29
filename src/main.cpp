@@ -5,8 +5,8 @@
 const char* ssid     = "---";
 const char* password = "---";
 const long Connect_Timeout = 10000;      //10 sec
-const IPAddress Local_IP(192, 168, 7, 144);
-const IPAddress Gateway(192, 168, 7, 1);
+const IPAddress Local_IP(192, 168, 1, 144);
+const IPAddress Gateway(192, 168, 1, 1);
 const IPAddress Subnet(255, 255, 255, 0);
 
 #elif MARQUEE
@@ -31,13 +31,20 @@ const int CS_PIN = D8;
 const int IN_BUTTON = A0;   //only one ADC available, so when using ESP82866 the gaming control through webserver. If HW solution needed, then use 4051 multiplexer (https://www.instructables.com/How-to-Use-Multiple-Analog-Sensors-on-Your-ESP8266)
 const int IN_AXIS_X = 17;
 const int IN_AXIS_Y = 18;
+#elif IS_NODEMCU
+const int CLK_PIN = D1;
+const int DATA_PIN = D2;
+const int CS_PIN = D3;
+const int IN_BUTTON = A0;
+const int IN_AXIS_X = 17;
+const int IN_AXIS_Y = 18;
 #else
 const int CS_PIN = D10;
 const int IN_BUTTON = A0;
 const int IN_AXIS_X = 17;
 const int IN_AXIS_Y = 18;
 #endif
-const int NUM_DEVICES = 2;  //number of Matrix leds attached
+const int NUM_DEVICES = 4;  //number of Matrix leds attached
 const char TEXT[] = "Hello world";
 
 #ifdef GAME

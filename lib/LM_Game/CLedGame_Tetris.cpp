@@ -5,48 +5,131 @@
 // Protected methods
 void CLedGameTetris::RefreshAnimation()
 {
-    IntCoordinateXY* item;
     m_leds->clear();
     m_leds->update(MD_MAX72XX::OFF);
-    for (int i = 0; i < m_CurrPiece->GetCoordinates()->size(); i++)
+    
+    //draw falling piece
+    IntCoordinateXY* item;
+    LinkedList<IntCoordinateXY*>* currPieceCoordinate = m_CurrPiece->GetCoordinates();
+    for (int i = 0; i < currPieceCoordinate->size(); i++)
     {
-        item = m_CurrPiece->GetCoordinates()->get(i);
-        m_leds->setPoint(m_CurrPiece->GetLeft() + item->x, m_iCurrentLevel + item->y, true);
-    }
-#ifdef DEBUG
-        if (m_CurrPiece->GetCoordinates()->size() == 0)
-            Serial.println("WARNING! Piece size is 0!");
-#endif
-    for (int i = 0; i < m_Base->size(); i++)
-    {
-        item = m_Base->get(i);
+        item = currPieceCoordinate->get(i);
         m_leds->setPoint(item->x, item->y, true);
     }
-    m_leds->update(MD_MAX72XX::ON);
+#ifdef DEBUG
+    if (currPieceCoordinate->size() == 0)
+        Serial.println("WARNING! Piece size is 0!");
+#endif
+    currPieceCoordinate->clear();
+    delete currPieceCoordinate;
 
+    //draw Base
+    for (int x = 0; x < 8; x++)
+    {
+        for (int y = 0; y < m_iNumDevices * 8; y++)
+        {
+            if (m_Base[x][y] == true)
+                m_leds->setPoint(x, y, true);
+        }
+    }
+
+    m_leds->update(MD_MAX72XX::ON);
     delay(300);         //this delay can be dynamic by regulating speed according to difficulty level
 }
 
 void CLedGameTetris::GameCalculate()
 {
-    if (CheckPiece())
+    IntCoordinateXY* item;
+    LinkedList<IntCoordinateXY*>* currPieceCoordinate = m_CurrPiece->GetCoordinates();
+
+    //check move horizontal X: [-1, +1]
+    bool isOk = true;
+    int xOffset = 0;
+    if (m_lastDirectionX == EDirection::Left ||
+        m_lastDirectionX == EDirection::Right)
     {
-        //piece can move horizontally or rotate
-        if (m_lastDirectionX == EDirection::Left ||
-            m_lastDirectionX == EDirection::Right)
+        for (int i = 0; i < currPieceCoordinate->size(); i++)
+        {
+            item = currPieceCoordinate->get(i);
+            if (m_lastDirectionX == EDirection::Left &&
+                item->x - 1 < 0)
+            {
+                isOk = false;
+                break;
+            }
+            else if (m_lastDirectionX == EDirection::Right &&
+                     item->x + 1 >= 8)
+            {
+                isOk = false;
+                break;
+            }
+            else
+            {
+                xOffset = (m_lastDirectionX == EDirection::Left) ? -1 : 1;
+                isOk &= m_Base[item->x + xOffset][item->y] == false;
+            }
+        }
+        if (isOk)
             m_CurrPiece->MoveHorizontalPiece(m_lastDirectionX);
-        if (m_ButtonA)
-            m_CurrPiece->RotatePiece(true);
-        if (m_ButtonB)
-            m_CurrPiece->RotatePiece(false);
-        m_iCurrentLevel++;  //implicitly moves the piece vertically
+    }
+    
+    //check rotation
+    isOk = true;
+    if (m_ButtonA || m_ButtonB)
+    {
+        bool clockwise = m_ButtonA ? true : false;
+        m_CurrPiece->RotatePiece(clockwise);    //just rotate and check if possible
+        for (int i = 0; i < currPieceCoordinate->size(); i++)
+        {
+            item = currPieceCoordinate->get(i);
+            isOk &= m_Base[item->x][item->y] == false;
+        }
+        if (!isOk)                              //if not possible, rotate to previous orientation
+            m_CurrPiece->RotatePiece(!clockwise);
+    }
+
+    //check move vertical Y: [+1]. If allowed -> m_currentLevel++ otherwise AddPiece()
+    isOk = true;
+    for (int i = 0; i < currPieceCoordinate->size(); i++)
+    {
+        item = currPieceCoordinate->get(i);
+        if (item->y + 1 >= m_iNumDevices * 8)
+        {
+            isOk = false;
+            break;
+        }
+        isOk &= m_Base[item->x][item->y + 1] == false;
+    }
+    if (isOk)
+    {
+        m_iCurrentLevel++;
+        m_CurrPiece->SetCurrentLevel(m_iCurrentLevel);
     }
     else
     {
-        //TODO: some of the points can be already added to Base
-        AddPieceToBase();
-        CreateNewPiece(false);
+        isOk = true;
+        for (int i = 0; i < currPieceCoordinate->size(); i++)
+        {
+            item = currPieceCoordinate->get(i);
+            if (item->y == 0)
+            {
+                isOk = false;
+                break;
+            }
+        }
+        //check piece already at top -> ResetGame()
+        if (isOk)
+        {
+            AddPieceToBase();
+            RemoveBaseCompleteLines();
+            CreateNewPiece(false);
+        }
+        else
+            ResetGame();
     }
+
+    currPieceCoordinate->clear();
+    delete currPieceCoordinate;
 }
 
 void CLedGameTetris::ResetGame()
@@ -60,46 +143,61 @@ void CLedGameTetris::ResetGame()
 void CLedGameTetris::AddPieceToBase()
 {
     IntCoordinateXY* item;
-    for (int i = 0; i < m_CurrPiece->GetCoordinates()->size(); i++)
+    LinkedList<IntCoordinateXY*>* currPieceCoordinate = m_CurrPiece->GetCoordinates();
+    for (int i = 0; i < currPieceCoordinate->size(); i++)
     {
-        item = m_CurrPiece->GetCoordinates()->get(i);
-        m_Base->add(new IntCoordinateXY {m_CurrPiece->GetLeft() + item->x, m_iCurrentLevel + item->y - 1});
+        item = currPieceCoordinate->get(i);
+        m_Base[item->x][item->y] = true;
     }
+    currPieceCoordinate->clear();
+    delete currPieceCoordinate;
 }
 
 void CLedGameTetris::CreateNewPiece(bool resetBase)
 {
     m_lastDirection = EDirection::None;
+    m_lastDirectionX = EDirection::None;
+    m_lastDirectionY = EDirection::None;
     m_iCurrentLevel = 0;
     m_CurrPiece->NewPiece();
 
     if (resetBase)
     {
-        IntCoordinateXY* item;
-        for (int i = m_Base->size() - 1; i >= 0; i--)
-        {
-            item = m_Base->remove(i);       //remove and destroy all objects inside list
-            delete item;
-        }
+        for (int x = 0; x < 8; x++)
+            for (int y = 0; y < m_iNumDevices * 8; y++)
+                m_Base[x][y] = false;
     }
 }
 
-bool CLedGameTetris::CheckPiece()
+void CLedGameTetris::RemoveBaseCompleteLines()
 {
-    //TODO: check if piece can move hor. (X: [+1, -1])
+    bool toRemove;
+    int yLine;
+    LinkedList<int>* linesToRemove = new LinkedList<int>();
     
-    //TODO: check vert. (Y: [+1])
-    
-    //TODO: check rotation
-    
-    //If can do the movement -> just return true so piece is moved/rotated. If not, call AddPiece(), and if not and also it at top of the screen then call ResetGame() as it's game over
+    for (yLine = m_iNumDevices * 8 - 1; yLine >= 0; yLine--)
+    {
+        toRemove = true;
+        for (int x = 0; x < 8; x++)
+            toRemove &= m_Base[x][yLine];
 
-    //
-    int maxPieceY = m_iCurrentLevel + m_CurrPiece->GetHeight();    
-    if (maxPieceY > m_leds->getColumnCount())   //TODO: add more checkings at Y-axis apart of bottom pixel
-        return false;
+        if (toRemove)
+            linesToRemove->add(yLine);
+    }
 
-    return true;
+    for (int i = 0; i < linesToRemove->size(); i++)
+    {
+        yLine = linesToRemove->get(i);
+        for (int y = yLine; y >= 1; y--)
+        {
+            for (int x = 0; x < 8; x++)
+                m_Base[x][y] = m_Base[x][y - 1];
+        }
+    }
+    for (int x = 0; x < 8; x++)
+        m_Base[x][0] = false;
+    
+    linesToRemove->clear();
+    delete linesToRemove;
 }
-
 #endif

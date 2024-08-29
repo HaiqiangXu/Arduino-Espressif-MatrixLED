@@ -20,34 +20,27 @@ public:
     };
     void NewPiece();
     void RotatePiece(bool clockwise);
-    void MoveHorizontalPiece(EDirection direction)
-    {
-        if (direction == EDirection::Left)
-        {
-            if (m_CurrPieceBoxLeft > 0)
-                m_CurrPieceBoxLeft--;
-        }
-        else if (direction == EDirection::Right)
-        {
-            if (m_CurrPieceBoxLeft + m_CurrPieceBoxWidth <= 7)
-                m_CurrPieceBoxLeft++;
-        }
-    };
+    void MoveHorizontalPiece(EDirection direction);
 
     // Data accessors
     LinkedList<IntCoordinateXY*>* GetCoordinates()
     {
-        //TODO: improve how to access to coordinates of the piece
-        return m_CurrPiece;
+        IntCoordinateXY* item;
+        IntCoordinateXY* newItem;
+        LinkedList<IntCoordinateXY*>* coordinates = new LinkedList<IntCoordinateXY*>();
+        for (int i = 0; i < m_CurrPiece->size(); i++)
+        {
+            item = m_CurrPiece->get(i);
+            newItem = new IntCoordinateXY { m_CurrPieceBoxLeft + item->x, m_iCurrentLevel + item->y };
+            coordinates->add(newItem);
+        }
+
+        return coordinates;
     };
 
-    int GetLeft()
+    void SetCurrentLevel(int iCurrentLevel)
     {
-        return m_CurrPieceBoxLeft;
-    };
-    int GetHeight()
-    {
-        return m_CurrPieceBoxHeight;
+        m_iCurrentLevel = iCurrentLevel;
     };
 
 private:
@@ -56,8 +49,8 @@ private:
     EPieceType m_CurrPieceType;
     int m_CurrPieceBoxLeft;
     int m_CurrPieceBoxWidth;
-    int m_CurrPieceBoxHeight;
     int m_CurrRotation;
+    int m_iCurrentLevel;
 
     // private methods
 };

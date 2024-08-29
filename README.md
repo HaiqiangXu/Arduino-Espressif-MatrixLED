@@ -26,15 +26,16 @@ Arduino-Matrix-LED
 |--lib
 |  |--LM_Game
 |  |  |- CLedGame_Tetris.cpp
+|  |  |- CLedGame_TetrisPiece.cpp
+|  |  |- CLedGame_TetrisPiece.h
 |  |  |- CLedGame_Snake.cpp
+|  |  |- CLedGame_TetrisPiece.cpp
 |  |  |- CLedGame.cpp
 |  |  |- CLedGame.h
 |  |  |- CLedGameController.h
 |  |--LM_Marquee
 |  |  |- CLedMarquee.cpp
 |  |  |- CLedMarquee.h
-|  |  |- CLedEyes.cpp
-|  |  |- CLedEyes.h
 |  |--LM_WeatherStation
 |  |  |- CLedWeather.cpp
 |  |  |- CLedWeather.h
@@ -59,5 +60,5 @@ Arduino-Generic-Libraries
 | -------------------- | :------------: |
 | Wemos D1 [ESP8266] | <img src="doc/img/d1-schematics.jpg" width="50%" alt="D1_Schematics"> |
 | Wemos D1 Mini [ESP8266] | <img src="doc/img/d1-mini-schematics.jpg" width="50%" alt="D1_Mini_Schematics"> |
-| Wemos DevKit V1 [ESP32] | <img src="doc/img/devkitv1-schematics.jpg" width="50%" alt="DevkitV1_Schematics"> |
+| DoIt DevKit V1 [ESP32] | <img src="doc/img/devkitv1-schematics.jpg" width="50%" alt="DevkitV1_Schematics"> |
 | Wemos D1 R32 [ESP32] | <img src="doc/img/d1-r32-schematics.jpg" width="50%" alt="D1_Schematics"> |
