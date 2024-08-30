@@ -84,6 +84,7 @@ private:
     // fields
     CLedGameTetrisPiece* m_CurrPiece;
     bool** m_Base;
+    int m_CurrentY;
 
     // protected methods
     virtual void RefreshAnimation();
@@ -91,6 +92,7 @@ private:
     virtual void ResetGame();
 
     // private methods
+    int DownPiece();
     void AddPieceToBase();
     void CreateNewPiece(bool resetBase);
     void RemoveBaseCompleteLines();

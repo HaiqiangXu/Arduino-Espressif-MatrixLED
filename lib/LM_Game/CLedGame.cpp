@@ -86,7 +86,7 @@ void CLedGame::ReadUserControls()
             Serial.println("Start button has been pressed");
         if (m_ButtonA || m_ButtonB)
             Serial.println("A button has been pressed");
-#endif        
+#endif
     }
     else
     {

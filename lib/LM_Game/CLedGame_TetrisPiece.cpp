@@ -10,7 +10,7 @@ void CLedGameTetrisPiece::NewPiece()
     m_CurrPieceType = static_cast<EPieceType>(ESP8266TrueRandom.random(7));
 #endif
     m_CurrRotation = 0;
-    m_iCurrentLevel = 0;
+    m_CurrPieceY = 0;
     IntCoordinateXY* item;
     for (int i = m_CurrPiece->size() - 1; i >= 0; i--)
     {

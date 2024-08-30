@@ -29,7 +29,6 @@ Arduino-Matrix-LED
 |  |  |- CLedGame_TetrisPiece.cpp
 |  |  |- CLedGame_TetrisPiece.h
 |  |  |- CLedGame_Snake.cpp
-|  |  |- CLedGame_TetrisPiece.cpp
 |  |  |- CLedGame.cpp
 |  |  |- CLedGame.h
 |  |  |- CLedGameController.h

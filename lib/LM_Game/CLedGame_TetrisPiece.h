@@ -31,16 +31,16 @@ public:
         for (int i = 0; i < m_CurrPiece->size(); i++)
         {
             item = m_CurrPiece->get(i);
-            newItem = new IntCoordinateXY { m_CurrPieceBoxLeft + item->x, m_iCurrentLevel + item->y };
+            newItem = new IntCoordinateXY { m_CurrPieceBoxLeft + item->x, m_CurrPieceY + item->y };
             coordinates->add(newItem);
         }
 
         return coordinates;
     };
 
-    void SetCurrentLevel(int iCurrentLevel)
+    void SetCurrentY(int iCurrentY)
     {
-        m_iCurrentLevel = iCurrentLevel;
+        m_CurrPieceY = iCurrentY;
     };
 
 private:
@@ -50,7 +50,7 @@ private:
     int m_CurrPieceBoxLeft;
     int m_CurrPieceBoxWidth;
     int m_CurrRotation;
-    int m_iCurrentLevel;
+    int m_CurrPieceY;
 
     // private methods
 };

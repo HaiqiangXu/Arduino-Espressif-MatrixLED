@@ -10,18 +10,18 @@ void CLedGameTetris::RefreshAnimation()
     
     //draw falling piece
     IntCoordinateXY* item;
-    LinkedList<IntCoordinateXY*>* currPieceCoordinate = m_CurrPiece->GetCoordinates();
-    for (int i = 0; i < currPieceCoordinate->size(); i++)
+    LinkedList<IntCoordinateXY*>* currPiece = m_CurrPiece->GetCoordinates();
+    for (int i = 0; i < currPiece->size(); i++)
     {
-        item = currPieceCoordinate->get(i);
+        item = currPiece->get(i);
         m_leds->setPoint(item->x, item->y, true);
     }
 #ifdef DEBUG
-    if (currPieceCoordinate->size() == 0)
+    if (currPiece->size() == 0)
         Serial.println("WARNING! Piece size is 0!");
 #endif
-    currPieceCoordinate->clear();
-    delete currPieceCoordinate;
+    currPiece->clear();
+    delete currPiece;
 
     //draw Base
     for (int x = 0; x < 8; x++)
@@ -40,7 +40,7 @@ void CLedGameTetris::RefreshAnimation()
 void CLedGameTetris::GameCalculate()
 {
     IntCoordinateXY* item;
-    LinkedList<IntCoordinateXY*>* currPieceCoordinate = m_CurrPiece->GetCoordinates();
+    LinkedList<IntCoordinateXY*>* currPiece = m_CurrPiece->GetCoordinates();
 
     //check move horizontal X: [-1, +1]
     bool isOk = true;
@@ -48,9 +48,12 @@ void CLedGameTetris::GameCalculate()
     if (m_lastDirectionX == EDirection::Left ||
         m_lastDirectionX == EDirection::Right)
     {
-        for (int i = 0; i < currPieceCoordinate->size(); i++)
+#ifdef DEBUG
+        Serial.println("Left/Right movement detected!");
+#endif
+        for (int i = 0; i < currPiece->size(); i++)
         {
-            item = currPieceCoordinate->get(i);
+            item = currPiece->get(i);
             if (m_lastDirectionX == EDirection::Left &&
                 item->x - 1 < 0)
             {
@@ -77,22 +80,48 @@ void CLedGameTetris::GameCalculate()
     isOk = true;
     if (m_ButtonA || m_ButtonB)
     {
+#ifdef DEBUG
+        Serial.println("Rotation detected!");
+#endif
         bool clockwise = m_ButtonA ? true : false;
         m_CurrPiece->RotatePiece(clockwise);    //just rotate and check if possible
-        for (int i = 0; i < currPieceCoordinate->size(); i++)
+        for (int i = 0; i < currPiece->size(); i++)
         {
-            item = currPieceCoordinate->get(i);
+            item = currPiece->get(i);
             isOk &= m_Base[item->x][item->y] == false;
         }
         if (!isOk)                              //if not possible, rotate to previous orientation
             m_CurrPiece->RotatePiece(!clockwise);
     }
+    currPiece->clear();
+    delete currPiece;
 
     //check move vertical Y: [+1]. If allowed -> m_currentLevel++ otherwise AddPiece()
-    isOk = true;
-    for (int i = 0; i < currPieceCoordinate->size(); i++)
+    if (m_lastDirectionY == EDirection::Up)
     {
-        item = currPieceCoordinate->get(i);
+#ifdef DEBUG
+        Serial.println("Up movement detected!. Move to bottom the piece");
+#endif
+        int action = 0;
+        do
+        {
+            action = DownPiece();
+        } while (action == 0);
+    }
+    else
+        DownPiece();
+}
+
+int CLedGameTetris::DownPiece()
+{
+    IntCoordinateXY* item;
+    LinkedList<IntCoordinateXY*>* currPiece = m_CurrPiece->GetCoordinates();
+    bool isOk = true;
+    int action = 0;
+
+    for (int i = 0; i < currPiece->size(); i++)
+    {
+        item = currPiece->get(i);
         if (item->y + 1 >= m_iNumDevices * 8)
         {
             isOk = false;
@@ -100,36 +129,46 @@ void CLedGameTetris::GameCalculate()
         }
         isOk &= m_Base[item->x][item->y + 1] == false;
     }
+
     if (isOk)
     {
-        m_iCurrentLevel++;
-        m_CurrPiece->SetCurrentLevel(m_iCurrentLevel);
+        //down one row
+        m_CurrentY++;
+        m_CurrPiece->SetCurrentY(m_CurrentY);
+        action = 0;
     }
     else
     {
         isOk = true;
-        for (int i = 0; i < currPieceCoordinate->size(); i++)
+        for (int i = 0; i < currPiece->size(); i++)
         {
-            item = currPieceCoordinate->get(i);
             if (item->y == 0)
             {
                 isOk = false;
                 break;
             }
         }
-        //check piece already at top -> ResetGame()
-        if (isOk)
+
+        if (isOk)   //piece contacted with Base
         {
             AddPieceToBase();
             RemoveBaseCompleteLines();
             CreateNewPiece(false);
+            action = 1;
         }
-        else
+        else        //piece already at top -> ResetGame()
+        {
+#ifdef DEBUG
+            Serial.println("Reset game!");
+#endif
             ResetGame();
+            action = 2;
+        }
     }
-
-    currPieceCoordinate->clear();
-    delete currPieceCoordinate;
+    currPiece->clear();
+    delete currPiece;
+    
+    return action;
 }
 
 void CLedGameTetris::ResetGame()
@@ -143,14 +182,14 @@ void CLedGameTetris::ResetGame()
 void CLedGameTetris::AddPieceToBase()
 {
     IntCoordinateXY* item;
-    LinkedList<IntCoordinateXY*>* currPieceCoordinate = m_CurrPiece->GetCoordinates();
-    for (int i = 0; i < currPieceCoordinate->size(); i++)
+    LinkedList<IntCoordinateXY*>* currPiece = m_CurrPiece->GetCoordinates();
+    for (int i = 0; i < currPiece->size(); i++)
     {
-        item = currPieceCoordinate->get(i);
+        item = currPiece->get(i);
         m_Base[item->x][item->y] = true;
     }
-    currPieceCoordinate->clear();
-    delete currPieceCoordinate;
+    currPiece->clear();
+    delete currPiece;
 }
 
 void CLedGameTetris::CreateNewPiece(bool resetBase)
@@ -158,7 +197,7 @@ void CLedGameTetris::CreateNewPiece(bool resetBase)
     m_lastDirection = EDirection::None;
     m_lastDirectionX = EDirection::None;
     m_lastDirectionY = EDirection::None;
-    m_iCurrentLevel = 0;
+    m_CurrentY = 0;
     m_CurrPiece->NewPiece();
 
     if (resetBase)
